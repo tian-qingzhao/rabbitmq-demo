@@ -1,18 +1,22 @@
 package com.tqz.rabbitmq.topic;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import org.springframework.amqp.core.ExchangeTypes;
+import com.tqz.rabbitmq.ConnectionUtil;
+
+import java.util.Date;
 
 /**
  * @Author: tian
  * @Date: 2020/4/25 22:18
  * @Desc: 生产者  测试topic交换机
- *        可以支持正则匹配
+ * 可以支持正则匹配
  */
 public class Producer {
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         //获取连接
         Connection connection = ConnectionUtil.getConnection();
         //创建一个通道
@@ -28,25 +32,28 @@ public class Producer {
         //第四个参数 autoDelete：是否自动删除队列，当最后一个消费者断开连接之后队列是否自动被删除，
         //可以通过RabbitMQ Management，查看某个队列的消费者数量，当consumers = 0时队列就会自动删除
         //第五个参数 arguments：相关参数，如最大能容纳多少条消息以及消息的寿命等，目前一般为null
-        channel.queueDeclare(ConnectionUtil.QUEUE_NAME1,true,false,false,null);
+        channel.queueDeclare(ConnectionUtil.TOPIC_QUEUE_NAME1, true, false, false, null);
         //删除交换机名称
         channel.exchangeDelete(ConnectionUtil.TOPIC_EXCHANGE);
 
         //第一个参数：交换机的名称
-        channel.exchangeDeclare(ConnectionUtil.TOPIC_EXCHANGE,ExchangeTypes.TOPIC);
+        channel.exchangeDeclare(ConnectionUtil.TOPIC_EXCHANGE, "topic");
 
-        //把交换机给队列绑定上
-        channel.queueBind(ConnectionUtil.QUEUE_NAME1, ConnectionUtil.TOPIC_EXCHANGE,"info.#");
-        channel.queueBind(ConnectionUtil.QUEUE_NAME2, ConnectionUtil.TOPIC_EXCHANGE,"info.*.test");
-        channel.queueBind(ConnectionUtil.QUEUE_NAME3, ConnectionUtil.TOPIC_EXCHANGE,"info.*.*");
-        channel.queueBind(ConnectionUtil.QUEUE_NAME4, ConnectionUtil.TOPIC_EXCHANGE,"info.*");
-        //第一个参数 exchange：交换机的名称，不写的话会用默认的 (AMQP default) 名称， direct类型的
-        //第二个参数 routingKey：为路由键，如果交换机用默认的，路由键会使用队列的名称
-        //第三个参数 props：为 消息的基本属性，例如路由头等
-        //第四个参数 body：为消息体
-        String message = "2020-04-24 22:52分，练习RabbitMQ";
-        while (true){
-            channel.basicPublish(ConnectionUtil.TOPIC_EXCHANGE,"info.user.test",null,message.getBytes());
+        // 把交换机给队列绑定上
+        // 生产者如果不想声明队列和队列绑定到交换机的步骤，也可以在消费者去实现，
+        // 生产者只需要定义交换机即可，消费者从该交换机上拿消息
+        channel.queueBind(ConnectionUtil.TOPIC_QUEUE_NAME1, ConnectionUtil.TOPIC_EXCHANGE, "info.#");
+        channel.queueBind(ConnectionUtil.TOPIC_QUEUE_NAME2, ConnectionUtil.TOPIC_EXCHANGE, "info.*.test");
+        channel.queueBind(ConnectionUtil.TOPIC_QUEUE_NAME3, ConnectionUtil.TOPIC_EXCHANGE, "info.*.*");
+        channel.queueBind(ConnectionUtil.TOPIC_QUEUE_NAME4, ConnectionUtil.TOPIC_EXCHANGE, "info.*");
+
+        while (true) {
+            //第一个参数 exchange：交换机的名称，不写的话会用默认的 (AMQP default) 名称， direct类型的
+            //第二个参数 routingKey：为路由键，如果交换机用默认的，路由键会使用队列的名称
+            //第三个参数 props：为 消息的基本属性，例如路由头等
+            //第四个参数 body：为消息体
+            String message = DateUtil.format(new Date(), DatePattern.NORM_DATETIME_MS_PATTERN);
+            channel.basicPublish(ConnectionUtil.TOPIC_EXCHANGE, "info.user.test", null, message.getBytes());
             //关闭资源
 //            channel.close();
 //            connection.close();
