@@ -1,4 +1,4 @@
-package com.tqz.rabbitmq.springbootmqdemo.producer;
+package com.tqz.rabbitmq.springboot.producer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,9 +9,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @Desc:
  */
 @SpringBootApplication
-public class ProviderApplication {
+public class SpringBootProducerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ProviderApplication.class, args);
+        SpringApplication.run(SpringBootProducerApplication.class, args);
     }
 }

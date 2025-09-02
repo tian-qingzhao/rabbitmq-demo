@@ -11,16 +11,17 @@ import com.tqz.rabbitmq.ConnectionUtil;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @Author: tian
  * @Date: 2020/4/25 22:18
- * @Desc: 生产者  测试direct交换机
+ * @Desc: 直连交换机生产者  测试direct交换机
  * 路由键完全匹配才会发送到相应的队列,
  * 如果不指定路由键，默认会使用队列的名称作为路由键。
  * 三种交换机使用的默认类型也是direct
  */
-public class Producer {
+public class DirectProducer {
 
     public static void main(String[] args) throws Exception {
         //获取连接
@@ -57,7 +58,9 @@ public class Producer {
         // 懒队列适合消息量大且长期有堆积的队列，可以减少内存使用，加快消费速度。
 //        params.put("x-queue-mode", "lazy");
 
-        // 存活时间。10秒钟不使用超时。创建queue时参数arguments设置了x-expires参数，该queue会在x-expires到期后queue消息，
+        // 存活时间。10秒钟不使用超时。创建queue时参数arguments设置了x-expires参数，
+        // 该queue会在x-expires到期后未被使用的情况下删除，
+        // 未被使用包括以下三点：1.没有任何消费者 2.未被重新声明过期时间 3.未调用过Basic.Get命令
         // 亲身测试直接消失（哪怕里面有未消费的消息）。
 //        params.put("x-expires", 10000);
         // 消息存活时间。5分钟过期。创建queue时设置该参数可指定消息在该queue中待多久，
@@ -114,25 +117,29 @@ public class Producer {
         channel.queueBind(ConnectionUtil.DIRECT_QUEUE_NAME3, ConnectionUtil.DIRECT_EXCHANGE, "debug.user");
         channel.queueBind(ConnectionUtil.DIRECT_QUEUE_NAME4, ConnectionUtil.DIRECT_EXCHANGE, "info.user");
 
+        for (int i = 0; i < 10; i++) {
+            String messageId = UUID.randomUUID().toString();
 
-
-        while (true) {
             AMQP.BasicProperties props = new AMQP.BasicProperties().builder()
                     .contentType("application/json") // 内容类型
                     .priority(MessageProperties.PERSISTENT_TEXT_PLAIN.getDeliveryMode()) // 优先级（0-9）
                     .deliveryMode(MessageProperties.PERSISTENT_TEXT_PLAIN.getDeliveryMode()) // 2=持久化（存硬盘）
                     .expiration("60000") // 消息60秒过期
+                    .messageId(messageId)
                     .build();
+            System.out.println("messageId：" + messageId);
 
             String message = DateUtil.format(new Date(), DatePattern.NORM_DATETIME_MS_PATTERN);
-            //第一个参数 exchange：交换机的名称，不写的话会用默认的 (AMQP default) 名称， direct类型的
-            //第二个参数 routingKey：为路由键，如果交换机用默认的，路由键会使用队列的名称
-            //第三个参数 props：为 消息的基本属性，例如路由头等
-            //第四个参数 body：为消息体
+            // 第一个参数 exchange：交换机的名称，不写的话会用默认的 (AMQP default) 名称， direct类型的
+            // 第二个参数 routingKey：为路由键，如果交换机用默认的，路由键会使用队列的名称
+            // 第三个参数 props：为 消息的基本属性，例如路由头等
+            // 第四个参数 body：为消息体
             channel.basicPublish(ConnectionUtil.DIRECT_EXCHANGE, "info.user", props, message.getBytes());
+
             //关闭资源
-//            channel.close();
-//            connection.close();
+            // channel.close();
+            // connection.close();
+
             Thread.sleep(800);
         }
     }

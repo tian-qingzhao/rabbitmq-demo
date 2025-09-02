@@ -42,10 +42,6 @@ public class HeadersProducer {
         channel.basicPublish(ConnectionUtil.HEADERS_EXCHANGE, ConnectionUtil.HEADERS_ROUTING_KEY1,
                 builder.build(), message.getBytes(StandardCharsets.UTF_8));
 
-//		channel.txSelect();
-//		channel.txCommit();
-//		channel.txRollback();
-
         channel.close();
         connection.close();
     }

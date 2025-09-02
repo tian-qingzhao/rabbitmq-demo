@@ -6,12 +6,12 @@ import com.tqz.rabbitmq.ConnectionUtil;
 import com.tqz.rabbitmq.MyDefaultConsumer;
 
 /**
- * 没有交换机的消费者2.
+ * 没有交换机的消费者1.
  *
  * @author <a href="https://github.com/tian-qingzhao">tianqingzhao</a>
  * @since 2025/8/31 14:25
  */
-public class Consumer2 {
+public class WorkQueueConsumer1 {
 
     public static void main(String[] args) throws Exception {
         Connection connection = ConnectionUtil.getConnection();

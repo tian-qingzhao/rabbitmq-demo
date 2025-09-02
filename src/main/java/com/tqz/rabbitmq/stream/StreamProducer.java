@@ -14,7 +14,7 @@ import java.util.Map;
  * @author <a href="https://github.com/tian-qingzhao">tianqingzhao</a>
  * @since 2025/8/31 17:39
  */
-public class StreamSender {
+public class StreamProducer {
 
     public static void main(String[] args) throws Exception {
         Connection connection = ConnectionUtil.getConnection();
@@ -23,9 +23,9 @@ public class StreamSender {
         Map<String, Object> params = new HashMap<>();
         // 声明Stream队列
         params.put("x-queue-type", "stream");
-        // maximum stream size: 20 GB
+        // maximum stream size: 20 GB，在磁盘的总空间，超过该大小，会自动删除前面的
         params.put("x-max-length-bytes", 20_000_000_000L);
-        // size of segment files: 100 MB
+        // size of segment files: 100 MB，每个小文件的大小
         params.put("x-stream-max-segment-size-bytes", 100_000_000);
         channel.exchangeDeclare(ConnectionUtil.STREAM_EXCHANGE, "topic");
         channel.queueDeclare(ConnectionUtil.STREAM_QUEUE_NAME1, true, false, false, params);

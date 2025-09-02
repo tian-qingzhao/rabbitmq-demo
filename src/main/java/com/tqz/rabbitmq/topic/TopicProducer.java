@@ -11,10 +11,10 @@ import java.util.Date;
 /**
  * @Author: tian
  * @Date: 2020/4/25 22:18
- * @Desc: 生产者  测试topic交换机
+ * @Desc: 主题交换机生产者  测试topic交换机
  * 可以支持正则匹配
  */
-public class Producer {
+public class TopicProducer {
 
     public static void main(String[] args) throws Exception {
         //获取连接
@@ -54,9 +54,11 @@ public class Producer {
             //第四个参数 body：为消息体
             String message = DateUtil.format(new Date(), DatePattern.NORM_DATETIME_MS_PATTERN);
             channel.basicPublish(ConnectionUtil.TOPIC_EXCHANGE, "info.user.test", null, message.getBytes());
-            //关闭资源
-//            channel.close();
-//            connection.close();
+
+            // 关闭资源
+            // channel.close();
+            // connection.close();
+
             Thread.sleep(800);
         }
     }

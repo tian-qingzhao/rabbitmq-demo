@@ -19,7 +19,7 @@ public class StreamConsumer {
     public static void main(String[] args) throws Exception {
         Connection connection = ConnectionUtil.getConnection();
         Channel channel = connection.createChannel();
-        // 1、这个属性必须设置。
+        // 1、stream类型的队列这个属性必须设置。
         channel.basicQos(1);
         // 2、声明Stream队列
         Map<String, Object> params = new HashMap<>();

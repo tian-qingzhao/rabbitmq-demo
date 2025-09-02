@@ -11,7 +11,7 @@ import com.tqz.rabbitmq.ConnectionUtil;
  * @author <a href="https://github.com/tian-qingzhao">tianqingzhao</a>
  * @since 2025/8/31 14:25
  */
-public class Producer {
+public class WorkQueueProducer {
 
     /**
      * 发布一个task，交由多个Worker去处理。 每个task只要由一个Worker完成就行。

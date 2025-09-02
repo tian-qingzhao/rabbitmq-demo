@@ -177,7 +177,8 @@ public class PublishConfirmsProducer {
             // 每100次确认一次
             if (outstandingMessageCount == batchSize) {
                 // uses a 5 second timeout
-                // 如果超时过期，则抛出TimeoutException。如果任何消息被nack(丢失）, waitForConfirmsOrDie将抛出IOException。
+                // 如果超时过期，则抛出TimeoutException
+                // 如果任何消息被nack(丢失）, waitForConfirmsOrDie将抛出IOException。
                 channel.waitForConfirmsOrDie(5_000);
                 outstandingMessageCount = 0;
             }
